@@ -69,4 +69,4 @@ grant select, insert, update on public.checklist_items to anon;
 do $$ begin
   alter publication supabase_realtime add table public.checklist_items;
 exception when duplicate_object then null;
-end $;
+end $$;
