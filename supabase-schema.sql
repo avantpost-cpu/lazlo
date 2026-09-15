@@ -24,13 +24,20 @@ create table if not exists public.events (
 alter table public.formations enable row level security;
 alter table public.events enable row level security;
 
+drop policy if exists "formations_public_read" on public.formations;
 create policy "formations_public_read" on public.formations for select to anon using (true);
+drop policy if exists "formations_public_insert" on public.formations;
 create policy "formations_public_insert" on public.formations for insert to anon with check (true);
+drop policy if exists "formations_public_delete" on public.formations;
 create policy "formations_public_delete" on public.formations for delete to anon using (true);
 
+drop policy if exists "events_public_read" on public.events;
 create policy "events_public_read" on public.events for select to anon using (true);
+drop policy if exists "events_public_insert" on public.events;
 create policy "events_public_insert" on public.events for insert to anon with check (true);
+drop policy if exists "events_public_update" on public.events;
 create policy "events_public_update" on public.events for update to anon using (true) with check (true);
+drop policy if exists "events_public_delete" on public.events;
 create policy "events_public_delete" on public.events for delete to anon using (true);
 
 grant usage on schema public to anon;
@@ -52,8 +59,14 @@ values
 on conflict (id) do nothing;
 
 alter table public.checklist_items enable row level security;
+drop policy if exists "checklist_public_read" on public.checklist_items;
 create policy "checklist_public_read" on public.checklist_items for select to anon using (true);
+drop policy if exists "checklist_public_insert" on public.checklist_items;
 create policy "checklist_public_insert" on public.checklist_items for insert to anon with check (true);
+drop policy if exists "checklist_public_update" on public.checklist_items;
 create policy "checklist_public_update" on public.checklist_items for update to anon using (true) with check (true);
 grant select, insert, update on public.checklist_items to anon;
-alter publication supabase_realtime add table public.checklist_items;
+do $ begin
+  alter publication supabase_realtime add table public.checklist_items;
+exception when duplicate_object then null;
+end $;
