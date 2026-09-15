@@ -66,7 +66,7 @@ create policy "checklist_public_insert" on public.checklist_items for insert to 
 drop policy if exists "checklist_public_update" on public.checklist_items;
 create policy "checklist_public_update" on public.checklist_items for update to anon using (true) with check (true);
 grant select, insert, update on public.checklist_items to anon;
-do $ begin
+do $$ begin
   alter publication supabase_realtime add table public.checklist_items;
 exception when duplicate_object then null;
 end $;
