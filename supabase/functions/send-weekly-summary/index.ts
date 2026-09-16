@@ -14,8 +14,9 @@ serve(async (req) => {
   }
 
   const body = await req.json().catch(() => ({}));
-  const to = body.to || "illustrations@cyrillesethi.com";
   const subject = body.subject || "Tableau de bord — cette semaine";
+  const configuredRecipients = (Deno.env.get("MAIL_TO") || "illustrations@cyrillesethi.com").split(",").map((email) => email.trim()).filter(Boolean);
+  const recipients = body.to ? (Array.isArray(body.to) ? body.to : [body.to]) : configuredRecipients;
   let html = body.html;
   if (!html) {
     const templateResponse = await fetch("https://avantpost-cpu.github.io/lazlo/mailing-hebdomadaire.html");
@@ -33,7 +34,7 @@ serve(async (req) => {
       "Authorization": `Bearer ${apiKey}`,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ from: FROM, to: [to], subject, html }),
+    body: JSON.stringify({ from: FROM, to: recipients, subject, html }),
   });
 
   const result = await response.json();
