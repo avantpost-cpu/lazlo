@@ -16,10 +16,15 @@ serve(async (req) => {
   const body = await req.json().catch(() => ({}));
   const to = body.to || "illustrations@cyrillesethi.com";
   const subject = body.subject || "Tableau de bord — cette semaine";
-  const html = body.html;
-
+  let html = body.html;
   if (!html) {
-    return Response.json({ error: "Missing html content" }, { status: 400 });
+    const templateResponse = await fetch("https://avantpost-cpu.github.io/lazlo/mailing-hebdomadaire.html");
+    if (!templateResponse.ok) {
+      return Response.json({ error: "Unable to load the mailing template" }, { status: 500 });
+    }
+    html = await templateResponse.text();
+    const date = new Intl.DateTimeFormat("fr-FR", { dateStyle: "long" }).format(new Date());
+    html = html.replace("[DATE DU JOUR]", date);
   }
 
   const response = await fetch(RESEND_API_URL, {
