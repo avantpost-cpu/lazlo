@@ -73,7 +73,7 @@ async function renderDrawings(): Promise<string> {
     if (!res.ok) { console.error("Storage folder unavailable", folder, res.status); continue; }
     const files = await res.json();
     for (const file of files) {
-      if (file.id && /\\.(png|jpe?g|webp|gif)$/i.test(file.name))
+      if (file.id && /\.(png|jpe?g|webp|gif)$/i.test(file.name))
         items.push({ path: folder + "/" + file.name, created: file.created_at || file.updated_at || "" });
     }
   }
