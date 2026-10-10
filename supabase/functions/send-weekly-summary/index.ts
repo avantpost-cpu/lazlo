@@ -45,6 +45,24 @@ async function fillDashboard(html: string): Promise<string> {
         upcoming.push({ date: f[field], label: `${label} — ${name}` });
     }
   }
+  // Vacances scolaires zone C : mêmes dates que sur le calendrier du site.
+  const holidays = [
+    { date: "2026-10-17", end: "2026-11-02", label: "Vacances de la Toussaint" },
+    { date: "2026-12-19", end: "2027-01-04", label: "Vacances de Noël" },
+    { date: "2027-02-06", end: "2027-02-22", label: "Vacances d’hiver" },
+    { date: "2027-04-03", end: "2027-04-19", label: "Vacances de printemps" },
+    { date: "2027-07-03", end: "", label: "Vacances d’été" }
+  ];
+  for (const holiday of holidays) {
+    if (holiday.end && holiday.end < today) continue;
+    const dates = holiday.end
+      ? `du ${formatDate(holiday.date)} au ${formatDate(holiday.end)}`
+      : `à partir du ${formatDate(holiday.date)}`;
+    upcoming.push({
+      date: holiday.date < today ? today : holiday.date,
+      label: `${holiday.label} — ${dates}`
+    });
+  }
   upcoming.sort((a, b) => a.date.localeCompare(b.date));
   const next = upcoming[0];
   const values: Record<string, string> = {
