@@ -76,7 +76,7 @@ function place(items,above){
   el.style.width=width+'px';
   el.style.setProperty('--c',above?'#e24b3c':groups[d[2]]);
   el.innerHTML='<small>'+d[0]+(range?' – '+range[1]:'')+'</small>'+safe(d[1]);
-  el.onclick=()=>{hidePreview();showArtwork(d)};el.addEventListener('mouseenter',e=>previewArtwork(d,e));el.addEventListener('mousemove',movePreview);el.addEventListener('mouseleave',hidePreview);el.addEventListener('blur',hidePreview);tl.append(el);
+  if(above){el.onclick=()=>hidePreview();el.style.cursor='default';}else{el.onclick=()=>{hidePreview();showArtwork(d)};el.addEventListener('mouseenter',e=>previewArtwork(d,e));el.addEventListener('mousemove',movePreview);el.addEventListener('mouseleave',hidePreview);el.addEventListener('blur',hidePreview);}tl.append(el);
  }
  return occupied.length;
 }
