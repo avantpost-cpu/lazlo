@@ -131,7 +131,7 @@ function render(){
   placeLayer('Histoire',history,true);
  }
  activeLayers.forEach((g,i)=>placeLayer(g,data.filter(d=>d[2]===g).sort((a,b)=>a[0]-b[0]),false,i));
- tl.querySelectorAll('.war').forEach(e=>{e.style.top='0';e.style.height='100%';e.style.display=selected.has('Histoire')?'':'none'});
+ tl.querySelectorAll('.war').forEach(e=>{e.style.top='0';e.style.height='100%';e.style.display=''});
  tl.style.height=Math.max(680,sharedY+maxRows*78+activeLayers.length*18+55)+'px';
  for(const w of eraWords){
   const el=document.createElement('div');el.className='era-word';el.textContent=w.label;
