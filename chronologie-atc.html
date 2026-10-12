@@ -56,6 +56,7 @@ function movePreview(e){const w=245,h=260;hoverPreview.style.left=Math.max(8,Mat
 async function previewArtwork(d,e){const w=curatedWorks[d[1]];if(!w){hidePreview();return}const token=++hoverToken;hoverPreview.style.display='block';movePreview(e);const caption=safe(w[1])+' · '+safe(w[0])+' · '+safe(w[2]);hoverPreview.innerHTML='<div class="preview-empty">Chargement…</div><div class="preview-caption">'+caption+'</div>';const url=await curatedImage(w);if(token!==hoverToken)return;hoverPreview.innerHTML=(url?'<img src="'+safe(url)+'" alt="'+safe(w[0])+'">':'<div class="preview-empty">Reproduction indisponible</div>')+'<div class="preview-caption">'+caption+'</div>'}
 function hidePreview(){hoverToken++;hoverPreview.style.display='none'}
 
+const durations={};
 const order=['Arts plastiques','Architecture','Design','Mode','Techniques'];let current='Arts plastiques';
 const historical=['Révolution française','Premier Empire','Première République','Restauration','Deuxième République','Second Empire','Troisième République','Quatrième République','Cinquième République','Révolution russe','Première Guerre mondiale','Seconde Guerre mondiale','Guerre froide','Colonialisme','Décolonisation','Hiroshima et Nagasaki','Apollo XI','11 septembre','7 octobre 2023'];
 function render(){filters.innerHTML='';tl.querySelectorAll('.event,.band,.discipline-label').forEach(e=>e.remove());for(const g of order){const b=document.createElement('button');b.textContent=g;b.className=current===g?'on':'';b.onclick=()=>{current=g;render()};filters.append(b)}
