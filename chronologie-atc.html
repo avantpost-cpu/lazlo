@@ -46,7 +46,8 @@ const artwork={
 'Cinéma':['Lumiere Arrival of a Train','Frères Lumière, 1896'],
 'Révolution numérique':['Apple Macintosh 1984','Apple Macintosh, 1984']
 };
-for(const d of data){if(!artwork[d[1]])artwork[d[1]]=[d[1]+' art history','Repère du cours ATC : '+d[1]];}\nconst cache=new Map();
+for(const d of data){if(!artwork[d[1]])artwork[d[1]]=[d[1]+' art history','Repère du cours ATC : '+d[1]];}
+const cache=new Map();
 function safe(t){return String(t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 async function showArtwork(d){
  const panel=document.getElementById('detail'),entry=artwork[d[1]]||[d[1], 'Illustration documentaire'];
