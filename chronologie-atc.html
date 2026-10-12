@@ -48,10 +48,26 @@ const artwork={
 };
 const curatedWorks={"Néoclassicismes":["Le Serment des Horaces","Jacques-Louis David","1784","Le_Serment_des_Horaces"],"Romantismes":["La Liberté guidant le peuple","Eugène Delacroix","1830","La_Liberté_guidant_le_peuple"],"Réalismes":["Des glaneuses","Jean-François Millet","1857","Des_glaneuses"],"Impressionnismes":["Impression, soleil levant","Claude Monet","1872","Impression,_soleil_levant"],"Salon des refusés":["Le Déjeuner sur l’herbe","Édouard Manet","1863","Le_Déjeuner_sur_l’herbe"],"Fauvisme":["La Femme au chapeau","Henri Matisse","1905","La_Femme_au_chapeau"],"Cubismes":["Les Demoiselles d’Avignon","Pablo Picasso","1907","Les_Demoiselles_d’Avignon"],"Dada":["Fontaine","Marcel Duchamp","1917","Fontaine_(Duchamp)"],"Surréalisme":["La Trahison des images","René Magritte","1929","La_Trahison_des_images"],"Art nouveau":["Entrées du métro parisien","Hector Guimard","vers 1900","Entrées_de_métro_de_Hector_Guimard"],"Tour Eiffel":["Tour Eiffel","Gustave Eiffel","1889","Tour_Eiffel"],"Bauhaus":["Chaise Wassily","Marcel Breuer","1925","Chaise_Wassily"],"De Stijl":["Chaise rouge et bleue","Gerrit Rietveld","1918","Chaise_rouge_et_bleue"],"Architecture internationale":["Villa Savoye","Le Corbusier","1928–1931","Villa_Savoye"],"Art déco":["Chrysler Building","William Van Alen","1930","Chrysler_Building"]};const localWorks={"Abstractions géométriques":"abstractiongeometrique.jpg","Abstraction lyrique":"abstractionlyrique.jpg","Art minimal":"artminimal.webp","Cobra":"cobra.jpeg","Fluxus":"fluxus.webp","Op Art":"opart.webp","Art conceptuel":"artconceptuel.jpg","Figuration libre":"figurationlibre.jpeg","Hyperréalisme":"hyperrealisme.webp","Néo-expressionnisme":"neoexpressionisme.webp","Nouveau Réalisme":"nouveaurealisme.webp","Pop art":"popart.jpg","Street art":"streetart.jpg"};
 function localImage(d){return localWorks[d[1]]?'oeuvres/'+localWorks[d[1]]:null}
-const curatedCache=new Map();async function curatedImage(w){if(curatedCache.has(w[3]))return curatedCache.get(w[3]);let url=null;try{const api='https://fr.wikipedia.org/w/api.php?action=query&titles='+encodeURIComponent(w[3].replaceAll('_',' '))+'&prop=pageimages&piprop=thumbnail&pithumbsize=600&format=json&origin=*';const r=await fetch(api);if(r.ok){const j=await r.json();url=Object.values(j.query?.pages||{})[0]?.thumbnail?.source||null}}catch(e){}curatedCache.set(w[3],url);return url}
+const curatedCache=new Map();async function curatedImage(w){
+ if(curatedCache.has(w[3]))return curatedCache.get(w[3]);
+ let url=null;
+ // Recherche uniquement l'article consacré à l'œuvre choisie, jamais une image aléatoire.
+ for(const lang of ['fr','en']){
+  try{
+   const api='https://'+lang+'.wikipedia.org/w/api.php?action=query&titles='+encodeURIComponent(w[3].replaceAll('_',' '))+'&prop=pageimages&piprop=thumbnail&pithumbsize=600&format=json&origin=*';
+   const r=await fetch(api);
+   if(!r.ok)continue;
+   const j=await r.json();
+   url=Object.values(j.query?.pages||{})[0]?.thumbnail?.source||null;
+   if(url)break;
+  }catch(e){}
+ }
+ curatedCache.set(w[3],url);
+ return url;
+}
 const cache=new Map();
 function safe(t){return String(t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-async function showArtwork(d){const panel=document.getElementById('detail'),w=curatedWorks[d[1]];panel.innerHTML='<strong>'+safe(d[2])+' · '+d[0]+'</strong><h2>'+safe(d[1])+'</h2><div id="curated-detail"></div>';const box=document.getElementById('curated-detail');if(local){box.innerHTML='<img class="art-img" src="'+safe(local)+'" alt="'+safe(d[1])+'">';return}if(!w){box.textContent='Œuvre de référence à sélectionner et à vérifier pour ce repère.';return}box.innerHTML='<h3>'+safe(w[0])+'</h3><p>'+safe(w[1])+' · '+safe(w[2])+'</p><p>Recherche de la reproduction…</p>';const url=await curatedImage(w);if(!box.isConnected)return;box.innerHTML=(url?'<img class="art-img" src="'+safe(url)+'" alt="'+safe(w[0])+'">':'<p>Reproduction indisponible.</p>')+'<p>'+safe(w[1])+' — <em>'+safe(w[0])+'</em> ('+safe(w[2])+')</p><a target="_blank" rel="noopener" href="https://fr.wikipedia.org/wiki/'+encodeURIComponent(w[3])+'">Source de l’œuvre ↗</a>'}
+async function showArtwork(d){const panel=document.getElementById('detail'),w=curatedWorks[d[1]],local=localImage(d);panel.innerHTML='<strong>'+safe(d[2])+' · '+d[0]+'</strong><h2>'+safe(d[1])+'</h2><div id="curated-detail"></div>';const box=document.getElementById('curated-detail');if(local){box.innerHTML='<img class="art-img" src="'+safe(local)+'" alt="'+safe(d[1])+'">';return}if(!w){box.textContent='Œuvre de référence à sélectionner et à vérifier pour ce repère.';return}box.innerHTML='<h3>'+safe(w[0])+'</h3><p>'+safe(w[1])+' · '+safe(w[2])+'</p><p>Recherche de la reproduction…</p>';const url=await curatedImage(w);if(!box.isConnected)return;box.innerHTML=(url?'<img class="art-img" src="'+safe(url)+'" alt="'+safe(w[0])+'">':'<p>Reproduction indisponible.</p>')+'<p>'+safe(w[1])+' — <em>'+safe(w[0])+'</em> ('+safe(w[2])+')</p><a target="_blank" rel="noopener" href="https://fr.wikipedia.org/wiki/'+encodeURIComponent(w[3])+'">Source de l’œuvre ↗</a>'}
 const hoverPreview=document.createElement('div');hoverPreview.className='hover-preview';hoverPreview.setAttribute('aria-hidden','true');document.body.appendChild(hoverPreview);
 let hoverToken=0;const previewCache=new Map();
 function movePreview(e){const w=245,h=260;hoverPreview.style.left=Math.max(8,Math.min(window.innerWidth-w,e.clientX+20))+'px';hoverPreview.style.top=Math.max(8,Math.min(window.innerHeight-h,e.clientY+18))+'px'}
